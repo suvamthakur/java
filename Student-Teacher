@@ -1,0 +1,66 @@
+package dbtest;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.Statement;
+
+public class test {
+	public static void main(String[] args) {
+        // Database URL, Username, and Password
+        String url = "jdbc:mysql://localhost:3306/temp"; // Change 'testdb' to your database name
+        String user = "root"; // Change to your MySQL username
+        String password = "Suvam2005@mysql"; // Change to your MySQL password
+
+        try {
+            // Load MySQL JDBC Driver
+            Class.forName("com.mysql.cj.jdbc.Driver");
+
+            // Establish connection
+            Connection connection = DriverManager.getConnection(url, user, password);
+
+            // Create tables
+            String studentQuery = "CREATE TABLE student (id INT PRIMARY KEY, sname VARCHAR(20), marks INT)";
+            String teacherQuery = "CREATE TABLE teacher (tname VARCHAR(25), dept VARCHAR(20))";
+
+            Statement statement = connection.createStatement();
+            statement.executeUpdate(studentQuery);
+            statement.executeUpdate(teacherQuery);
+
+            // Insert data
+            System.out.print("Inserting 2 student table values: ");
+            System.out.println(statement.executeUpdate("INSERT INTO student VALUES (11, 'sasanka kundu', 95)"));
+            System.out.println(statement.executeUpdate("INSERT INTO student VALUES (3, 'ayush sharma', 90)"));
+
+            System.out.print("Inserting 2 teacher table values: ");
+            System.out.println(statement.executeUpdate("INSERT INTO teacher VALUES ('sam', 'physics')"));
+            System.out.println(statement.executeUpdate("INSERT INTO teacher VALUES ('rita', 'math')"));
+
+            // Update teacher table
+            statement.executeUpdate("UPDATE teacher SET tname='Dr. rita' WHERE tname='rita'");
+            String updateTeacher = "UPDATE teacher SET tname=CONCAT('Dr. ', tname)";
+            PreparedStatement ps = connection.prepareStatement(updateTeacher);
+            ps.executeUpdate();
+
+            // Delete a student record
+            statement.executeUpdate("DELETE FROM student WHERE id=3");
+            
+            statement.executeUpdate("INSERT INTO student VALUES (3, 'ayush', 88)");
+
+            // Fetch student records (no need for moveToInsertRow)
+            ResultSet rs = statement.executeQuery("SELECT * FROM student WHERE sname='ayush'");
+            while (rs.next()) {
+                System.out.println(rs.getInt("id") + " " + rs.getString("sname") + " " + rs.getInt("marks"));
+            }
+
+            // Close resources
+            rs.close();
+            statement.close();
+            connection.close();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+}
