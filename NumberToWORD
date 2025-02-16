@@ -1,0 +1,47 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+</head>
+<body>
+<%
+        String numStr = request.getParameter("num");
+        if (numStr != null && !numStr.isEmpty()) {
+            try {
+                int number = Integer.parseInt(numStr);
+                
+                // Convert number to words
+                String words = convertToWords(number);
+                out.println("<h3>Number in words: " + words + "</h3>");
+                
+            } catch (NumberFormatException e) {
+                out.println("<p style='color:red;'>Please enter a valid number.</p>");
+            }
+        }
+    %>
+
+    <%!  
+        public String convertToWords(int number) {
+            String[] units = {
+                "", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine", "Ten",
+                "Eleven", "Twelve", "Thirteen", "Fourteen", "Fifteen", "Sixteen", "Seventeen", "Eighteen", "Nineteen"
+            };
+            
+            String[] tens = {
+                "", "", "Twenty", "Thirty", "Forty", "Fifty", "Sixty", "Seventy", "Eighty", "Ninety"
+            };
+
+            if (number == 0) return "Zero";
+            if (number < 20) return units[number];
+            if (number < 100) return tens[number / 10] + (number % 10 != 0 ? " " + units[number % 10] : "");
+            if (number < 1000) return units[number / 100] + " Hundred" + (number % 100 != 0 ? " " + convertToWords(number % 100) : "");
+            if (number < 1_000_000) return convertToWords(number / 1000) + " Thousand" + (number % 1000 != 0 ? " " + convertToWords(number % 1000) : "");
+            if (number < 1_000_000_000) return convertToWords(number / 1_000_000) + " Million" + (number % 1_000_000 != 0 ? " " + convertToWords(number % 1_000_000) : "");
+            return convertToWords(number / 1_000_000_000) + " Billion" + (number % 1_000_000_000 != 0 ? " " + convertToWords(number % 1_000_000_000) : "");
+        }
+    %>
+</body>
+</html>
